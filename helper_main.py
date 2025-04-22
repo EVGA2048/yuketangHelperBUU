@@ -5,8 +5,45 @@ import json
 import get_info
 from videoHelper import videoHelper
 from homeworkHelper import homeworkHelper
+import cmdline_menu
 
-domain = input("输入雨课堂域名：(BUU输入buu.yuketang.cn)")
+#初始化cmdline_menu
+menuType = "medium"
+borderStyle = "dashed"
+cmdline_menu.echo_info("DEBUG","cmdline_menu size set to 'medium'")
+cmdline_menu.echo_info("DEBUG","cmdline_menu style set to 'dashed'")
+cmdline_menu.switch_sound()
+
+cmdline_menu.drawBorder(menuType , borderStyle)
+cmdline_menu.welcome_panel("欢迎使用yuketangHelperBUU!")
+cmdline_menu.singlespace()
+cmdline_menu.raw_text("请选择雨课堂网址")
+cmdline_menu.singlespace()
+cmdline_menu.create_option("1","BUU - 北京联合大学雨课堂")
+cmdline_menu.raw_text("buu.yuketang.cn")
+cmdline_menu.singlespace()
+cmdline_menu.create_option("2","USTC - 中国科学技术大学雨课堂")
+cmdline_menu.raw_text("ustc.yuketang.cn")
+cmdline_menu.singlespace()
+cmdline_menu.create_option("0","手动输入网址")
+cmdline_menu.singlespace()
+cmdline_menu.singlespace()
+cmdline_menu.drawBorder(menuType , borderStyle)
+print("### 请输入选项(0-2): ###")
+
+domain_option = cmdline_menu.read_selection()
+cmdline_menu.switch_sound()
+
+match domain_option:
+    case 0:
+        cmdline_menu.clear_cmdline_x10()
+        cmdline_menu.clear_cmdline_x10()
+        domain = input('输入雨课堂域名：(例如xxx.yuketang.cn)')
+    case 1:
+        domain = ("buu.yuketang.cn")
+    case 2:
+        domain = ("ustc.yuketang.cn")
+
 cookies = get_info.getCookies(domain)
 csrftoken, sessionid = get_info.extract_specific_cookies(cookies)  # 需改成自己的
 university_id = get_info.getUniversityId(domain)  # 需改成自己的
@@ -37,7 +74,8 @@ if __name__ == "__main__":
     try:
         user_id = re.search(r'"user_id":(.+?)}', id_response.text).group(1).strip()
     except:
-        print("也许是网路问题，获取不了user_id,请试着重新运行")
+        cmdline_menu.echo_info("FATAL","也许是网路问题，获取不了user_id,请试着重新运行")
+        
         raise Exception(
             "也许是网路问题，获取不了user_id,请试着重新运行!!! please re-run this program!"
         )
@@ -76,7 +114,7 @@ if __name__ == "__main__":
 
     # 显示用户提示
     for index, value in enumerate(courses):
-        print("编号：" + str(index + 1) + " 课名：" + str(value["course_name"]))
+        cmdline_menu.echo_info("INFO","[" + str(index + 1) + "]" + str(value["course_name"]))
 
     flag = True
     while flag:
@@ -85,17 +123,21 @@ if __name__ == "__main__":
         try:
             user_info = json.loads(user_info_r.text)["data"]["user_info"]
             user_realname = user_info["name"]
-            print("欢迎您，" + user_realname)
+            cmdline_menu.drawBorder(menuType,borderStyle)
+            cmdline_menu.raw_text("欢迎！" + user_realname)
         except:
-            print("也许是网路问题,获取不了user_info,请试着重新运行")
+            cmdline_menu.echo_info("FATAL","也许是网路问题，获取不了user_id,请试着重新运行")
+
+        cmdline_menu.drawBorder(menuType,borderStyle)
         number = input("你想刷哪门课呢?请输入编号。输入0表示全部课程都刷一遍\n")
+        cmdline_menu.switch_sound()
         # 输入不合法则重新输入
         video_helper = videoHelper(domain, cookies, user_id, university_id, 12, headers)
         homework_helper = homeworkHelper(
             domain, cookies, user_id, university_id, headers
         )
         if not (number.isdigit()) or int(number) > len(courses):
-            print("输入不合法！")
+            cmdline_menu.echo_info("WARN","输入不合法！")
             continue
         elif int(number) == 0:
             flag = False  # 输入合法则不需要循环
@@ -138,4 +180,5 @@ if __name__ == "__main__":
                 courses[number]["course_sign"],
                 courses[number]["course_name"],
             )
-        print("搞定啦")
+        cmdline_menu.echo_info("INFO","搞定啦")
+        cmdline_menu.switch_sound()

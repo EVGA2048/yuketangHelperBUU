@@ -8,6 +8,13 @@ import requests
 import re
 import json
 import threading
+import cmdline_menu
+
+#初始化cmdline_menu
+menuType = "medium"
+borderStyle = "dashed"
+cmdline_menu.initialize_menu_type(menuType , borderStyle)
+
 
 # 以下字段不用改，下面的代码也不用改动
 user_id = ""
@@ -50,10 +57,10 @@ class videoHelper:
         except:
             pass
         if if_completed == "1":
-            print(video_name + "已经学习完毕，跳过")
+            cmdline_menu.echo_info("WARN",video_name + "已经学习完毕，跳过")
             return 1
         else:
-            print(video_name + "，尚未学习，现在开始自动学习")
+            cmdline_menu.echo_info("INFO",video_name + "，尚未学习，现在开始自动学习")
             time.sleep(2)
 
         # 默认为0（即还没开始看）
@@ -68,7 +75,7 @@ class videoHelper:
             val = tmp_rate
             video_frame = res_rate["data"][video_id]["watch_length"]
         except Exception as e:
-            print(e.__str__())
+            cmdline_menu.echo_info("ERROR",e.__str__())
 
         t = time.time()
         timstap = int(round(t * 1000))
@@ -114,9 +121,9 @@ class videoHelper:
                     .group(1)
                     .strip()
                 )
-                print("由于网络阻塞，万恶的雨课堂，要阻塞" + str(delay_time) + "秒")
+                cmdline_menu.echo_info("WARN","由于网络阻塞，万恶的雨课堂，要阻塞" + str(delay_time) + "秒")
                 time.sleep(float(delay_time) + 0.5)
-                print("恢复工作啦～～")
+                cmdline_menu.echo_info("INFO","恢复工作啦～～")
                 submit_url = (
                     "https://"
                     + self.domain
@@ -134,7 +141,7 @@ class videoHelper:
                 if tmp_rate is None:
                     return 0
                 val = str(tmp_rate)
-                print(
+                cmdline_menu.echo_info("INFO",
                     video_name
                     + "学习进度为：\t"
                     + str(format(float(val) * 100, ".2f"))
@@ -142,9 +149,9 @@ class videoHelper:
                 )
                 time.sleep(2)
             except Exception as e:
-                print(e.__str__())
+                cmdline_menu.echo_info("ERROR",e.__str__())
                 pass
-        print("视频" + video_id + " " + video_name + "学习完成！")
+        cmdline_menu.echo_info("INFO","视频" + video_id + " " + video_name + "学习完成！")
         return 1
 
     def get_videos_ids(self, course_name, classroom_id, course_sign):
@@ -172,10 +179,10 @@ class videoHelper:
                         if j["leaf_type"] == leaf_type["video"]:
                             # homework_ids.append(j["id"])
                             homework_dic[j["id"]] = j["name"]
-            print(course_name + "共有" + str(len(homework_dic)) + "个作业喔！")
+            cmdline_menu.echo_info("INFO",course_name + "共有" + str(len(homework_dic)) + "个作业喔！")
             return homework_dic
         except:
-            print("fail while getting homework_ids!!! please re-run this program!")
+            cmdline_menu.echo_info("FATAL","fail while getting homework_ids!!! please re-run this program!")
             raise Exception(
                 "fail while getting homework_ids!!! please re-run this program!"
             )
@@ -210,7 +217,7 @@ class videoHelper:
                     classroom_id,
                     sku_id,
                 ),
-                deamon=True,
+                daemon=True,
             )
             thread.start()
             threads.append(thread)
