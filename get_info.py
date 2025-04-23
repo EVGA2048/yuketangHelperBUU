@@ -52,6 +52,7 @@ def getCookies(domain):
     cmdline_menu.drawBorder(menuType , borderStyle)
     print("请输入选项(0-1):")
     cookies_option = cmdline_menu.read_selection()
+    cmdline_menu.switch_sound()
 
     match cookies_option:
         case 0:
@@ -83,6 +84,7 @@ def getCookies(domain):
         cmdline_menu.singlespace()
         cmdline_menu.drawBorder(menuType , borderStyle)
         cookies_option = cmdline_menu.read_selection()
+        cmdline_menu.switch_sound()
         match cookies_option:
             case 1:
                 filename = "cookies"

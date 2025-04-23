@@ -288,7 +288,7 @@ def echo_info(status,text):
 
 def warn_sound():
     if enable_sound == True:
-        frequency = 1200  # 设置频率
+        frequency = 1000  # 设置频率
         duration = 200  # 设置持续时间（毫秒）
         winsound.Beep(frequency, duration)
 

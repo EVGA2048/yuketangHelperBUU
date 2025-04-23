@@ -166,24 +166,25 @@ class homeworkHelper:
                                 cmdline_menu.echo_info("WARN",f"等待结束，进行第 {retries} 次重试...")
                                 continue  # 继续下一次循环，即重试提交
                         result_info = json.loads(response.text)
-                        if result_info["msg"] == "you do not have chance to answer":
-                            cmdline_menu.echo_info("WARN","该题没有答题机会了")
-                        else:
-                            cmdline_menu.echo_info("INFO",
-                                "该问题得分为：",
-                                result_info["data"]["score"],
-                                "作答结果为：",
-                                result_info["data"]["is_right"],
-                            )
-                        break  # 提交成功，跳出重试循环
+                        try:
+                            if result_info["msg"] == "you do not have chance to answer":
+                                cmdline_menu.echo_info("WARN","该题没有答题机会了")
+                            else:
+                                cmdline_menu.echo_info("INFO",
+                                    "该问题得分为：",
+                                    result_info["data"]["my_score"],
+                                    "作答结果为：",
+                                    result_info["data"]["is_right"],
+                                )
+                            break  # 提交成功，跳出重试循环
+                        except:
+                            cmdline_menu.echo_info("INFO",result_info)
 
                     except requests.exceptions.Timeout as e:
                         cmdline_menu.echo_info("WARN",f"请求超时，第{retries+1}次重试...")
                         retries += 1
                         time.sleep(2**retries)  # 指数退避
-                    except (
-                        requests.exceptions.RequestException
-                    ) as e:  # 捕获其他请求异常
+                    except requests.exceptions.RequestException as e:  # 捕获其他请求异常
                         cmdline_menu.echo_info("ERROR",f"请求异常: {str(e)}")
                         break  # 遇到其他请求异常，跳出重试循环，避免无限重试
             cmdline_menu.echo_info("INFO",dictionary["data"]["name"] + "已经完成!")
